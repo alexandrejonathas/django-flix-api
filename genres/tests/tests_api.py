@@ -6,6 +6,12 @@ import json
 
 class GenreApiTest(GenreBaseTest):
 
+    def test_api_resource_genres_method_not_allowed(self):
+
+        response = self.client.patch(reverse('genres:genres_resources'))
+
+        self.assertEqual(response.status_code, 405)
+
     def test_api_resource_genres_list(self):
 
         self.make_genre(name='Ação')

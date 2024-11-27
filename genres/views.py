@@ -22,6 +22,6 @@ def genres_view(request):
 
         return JsonResponse(data={'id': genre.id, 'name': genre.name}, status=201, safe=False)
 
-    return HttpResponse(status_code=405)
+    return HttpResponse(status=405)
 
 
