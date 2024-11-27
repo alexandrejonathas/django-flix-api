@@ -19,4 +19,3 @@ class GenreApiTest(GenreBaseTest):
         self.assertEqual(len(genres), 2)
         self.assertEqual(int(genres[0]['id']), 1)
         self.assertEqual(genres[0]['name'], 'Ação')
-

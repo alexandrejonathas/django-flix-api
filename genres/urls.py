@@ -5,5 +5,5 @@ from genres import views
 app_name = 'genres'
 
 urlpatterns = [
-    path('api/genres', views.index, name='list'),
+    path('api/genres', views.list, name='list'),
 ]
