@@ -11,7 +11,7 @@ class GenreApiTest(GenreBaseTest):
         self.make_genre(name='Ação')
         self.make_genre(name='Drama')
 
-        response = self.client.get(reverse('genres:list'))
+        response = self.client.get(reverse('genres:genres_resources'))
 
         genres = json.loads(response.content)
 
@@ -19,3 +19,19 @@ class GenreApiTest(GenreBaseTest):
         self.assertEqual(len(genres), 2)
         self.assertEqual(int(genres[0]['id']), 1)
         self.assertEqual(genres[0]['name'], 'Ação')
+
+    def test_api_resource_genres_create(self):
+
+        genre = {'name': 'Terror'}
+        
+        response = self.client.post(
+            reverse('genres:genres_resources'), 
+            data=json.dumps(genre),
+            content_type='application/json'
+        )
+
+        genre = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(int(genre['id']), 1)
+        self.assertEqual(genre['name'], 'Terror')        
