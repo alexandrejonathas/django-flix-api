@@ -14,4 +14,6 @@ Use `python manage.py makemigrations` para criar migrações.
 
 Use `python manage.py migrate` para executar as migrações.
 
+Use `python manage.py createsuperuser` para criar um usuarário administrador do sistema.
+
 Use `python manage.py runserver` para executar o servidor de aplicação para desenvolvimento.
