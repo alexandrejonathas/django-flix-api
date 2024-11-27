@@ -1,6 +1,11 @@
 from django.http import JsonResponse
 
+from genres.models import Genre
 
 def index(request):
 
-    return JsonResponse(data={'id': '1', 'name': 'Genre mock'})
+    genres = Genre.objects.all()
+
+    data = [{'id': genre.id, 'name': genre.name} for genre in genres]
+
+    return JsonResponse(data, safe=False)
