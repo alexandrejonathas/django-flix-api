@@ -36,4 +36,82 @@ class ActorApiTest(ActorBaseTest):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(int(actor['id']), 1)
-        self.assertEqual(actor['name'], 'Silvester Stalone')                   
+        self.assertEqual(actor['name'], 'Silvester Stalone')
+
+    def test_api_resource_actor_retrieve_not_found(self):
+
+        self.make_actor(name='Silvester Stalone')
+        self.make_actor(name='Sharon Stone')
+
+        response = self.client.get(
+            reverse('actors:actors_retrieve_update_delete', kwargs={'pk': 3}),
+        )
+
+        self.assertEqual(response.status_code, 404)                  
+
+    def test_api_resource_actor_retrieve(self):
+
+        self.make_actor(name='Silvester Stalone')
+        self.make_actor(name='Sharon Stone')
+
+        response = self.client.get(
+            reverse('actors:actors_retrieve_update_delete', kwargs={'pk': 1}),
+        )
+
+        actor = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(int(actor['id']), 1)
+        self.assertEqual(actor['name'], 'Silvester Stalone')  
+
+    def test_api_resource_actor_update(self):
+
+        self.make_actor(name='Silvester Stalone')
+        self.make_actor(name='Sharon Stone')
+
+        response = self.client.put(
+            reverse('actors:actors_retrieve_update_delete', kwargs={'pk': 1}),
+            data=json.dumps({'name': 'Jack Chan'}),
+            content_type='application/json'
+        )
+
+        actor = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(int(actor['id']), 1)
+        self.assertEqual(actor['name'], 'Jack Chan') 
+
+    def test_api_resource_actor_update_not_found(self):
+
+        self.make_actor(name='Silvester Stalone')
+        self.make_actor(name='Sharon Stone')
+
+        response = self.client.put(
+            reverse('actors:actors_retrieve_update_delete', kwargs={'pk': 3}),
+            data=json.dumps({'name': 'Jack Chan'}),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_api_resource_actor_delete(self):
+
+        self.make_actor(name='Silvester Stalone')
+        self.make_actor(name='Sharon Stone')
+
+        response = self.client.delete(
+            reverse('actors:actors_retrieve_update_delete', kwargs={'pk': 1}),
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+    def test_api_resource_actor_delete_not_found(self):
+
+        self.make_actor(name='Silvester Stalone')
+        self.make_actor(name='Sharon Stone')
+
+        response = self.client.delete(
+            reverse('actors:actors_retrieve_update_delete', kwargs={'pk': 3}),
+        )
+
+        self.assertEqual(response.status_code, 404)  
