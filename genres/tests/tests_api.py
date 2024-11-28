@@ -75,4 +75,31 @@ class GenreApiTest(GenreBaseTest):
             reverse('genres:genres_find_update_delete', kwargs={'genre_id': 3})
         )
 
-        self.assertEqual(response.status_code, 404)      
+        self.assertEqual(response.status_code, 404)
+
+    def test_api_resource_genres_update(self):
+
+        self.make_genre(name='Ação')
+
+        response = self.client.put(
+            reverse('genres:genres_find_update_delete', kwargs={'genre_id': 1}),
+            data=json.dumps({'name': 'Comédia'})
+        )
+
+        genre = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(int(genre['id']), 1)
+        self.assertEqual(genre['name'], 'Comédia')
+
+    def test_api_resource_genres_update_not_found(self):
+
+        self.make_genre(name='Ação')
+
+        response = self.client.put(
+            reverse('genres:genres_find_update_delete', kwargs={'genre_id': 2}),
+            data=json.dumps({'name': 'Comédia'})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
