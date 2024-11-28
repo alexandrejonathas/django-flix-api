@@ -5,9 +5,10 @@ from genres.models import Genre
 
 import json
 
-def genres_view(request):
+def genres_view(request, genre_id=None):
 
     if request.method == 'GET':
+
         genres = Genre.objects.all()
 
         data = [{'id': genre.id, 'name': genre.name} for genre in genres]
@@ -25,3 +26,15 @@ def genres_view(request):
     return HttpResponse(status=405)
 
 
+def genres_find_update_delete(request, genre_id):
+
+    if request.method == 'GET':
+
+        genre = Genre.objects.filter(id=genre_id).first()
+
+        if not genre:
+            return HttpResponse(status=404)
+        
+        return JsonResponse(data={'id': genre.id, 'name': genre.name}, safe=False)
+    
+    return HttpResponse(status=405)
