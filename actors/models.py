@@ -12,6 +12,7 @@ NATIONALITY_CHOICES = (
     ('HOL', 'Holanda'),
     ('ITA', 'Italia'),
     ('JAP', 'Japao'),
+    ('USA', 'Estados Unidos')
 )
 
 
