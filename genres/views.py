@@ -8,7 +8,7 @@ import json
 
 
 @csrf_exempt
-def genres_view(request, genre_id=None):
+def genres_create_list_view(request):
 
     if request.method == 'GET':
 
