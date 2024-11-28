@@ -1,10 +1,13 @@
 from django.shortcuts import HttpResponse
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from genres.models import Genre
 
 import json
 
+
+@csrf_exempt
 def genres_view(request, genre_id=None):
 
     if request.method == 'GET':
@@ -26,6 +29,7 @@ def genres_view(request, genre_id=None):
     return HttpResponse(status=405)
 
 
+@csrf_exempt
 def genres_find_update_delete(request, genre_id):
 
     if request.method == 'GET':
