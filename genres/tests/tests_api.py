@@ -103,3 +103,25 @@ class GenreApiTest(GenreBaseTest):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_api_resource_genres_delete(self):
+
+        self.make_genre(name='Ação')
+
+        response = self.client.delete(
+            reverse('genres:genres_find_update_delete', kwargs={'genre_id': 1})
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+    def test_api_resource_genres_delete_not_found(self):
+
+        self.make_genre(name='Ação')
+
+        response = self.client.delete(
+            reverse('genres:genres_find_update_delete', kwargs={'genre_id': 2})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+

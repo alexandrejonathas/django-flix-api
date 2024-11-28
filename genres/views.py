@@ -50,4 +50,14 @@ def genres_find_update_delete(request, genre_id):
 
         return JsonResponse(data={'id': genre.id, 'name': genre.name}, safe=False)        
 
+    if request.method == 'DELETE':
+        genre = Genre.objects.filter(id=genre_id).first()
+
+        if not genre:
+            return HttpResponse(status=404)
+        
+        genre.delete()
+
+        return HttpResponse(status=204)
+
     return HttpResponse(status=405)
