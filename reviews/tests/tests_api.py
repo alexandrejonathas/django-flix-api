@@ -3,13 +3,28 @@ from datetime import date
 from django.urls import reverse
 
 from .tests_review_base import ReviewBaseTest
+from reviews.models import Review
 
 
 class ReviewApiTest(ReviewBaseTest):
 
+    def setUp(self):
+        self.userdata = {'username': 'user', 'password': 'password'}
+        
+        self.user = self.make_user(
+            username=self.userdata.get('username'),
+            password=self.userdata.get('password')
+        )
+
     def test_api_resource_review_method_not_allowed(self):
 
-        response = self.client.patch(reverse('reviews:reviews_create_list'))
+        self.make_user_permissions(user=self.user, model=Review, perms=['view_review', 'change_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
+        response = self.client.patch(
+            reverse('reviews:reviews_create_list'),
+            headers={'Authorization': f'Bearer {token}'}
+        )
 
         self.assertEqual(response.status_code, 405)
 
@@ -23,7 +38,13 @@ class ReviewApiTest(ReviewBaseTest):
         self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
-        response = self.client.get(reverse('reviews:reviews_create_list'))
+        self.make_user_permissions(user=self.user, model=Review, perms=['view_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
+        response = self.client.get(
+            reverse('reviews:reviews_create_list'),
+            headers={'Authorization': f'Bearer {token}'}
+        )
 
         reviews = json.loads(response.content.decode('utf-8'))
 
@@ -39,6 +60,9 @@ class ReviewApiTest(ReviewBaseTest):
 
         self.make_movie(title='The equalizer', actors_data=[denzel_washington, marton_csokas]) # noqa
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['add_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.post(
             reverse('reviews:reviews_create_list'),
             data=json.dumps(
@@ -48,7 +72,8 @@ class ReviewApiTest(ReviewBaseTest):
                     'comment': 'Ótimo filme de ação' 
                 }
             ),
-            content_type='application/json'
+            content_type='application/json',
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         review = json.loads(response.content.decode('utf-8'))
@@ -67,6 +92,9 @@ class ReviewApiTest(ReviewBaseTest):
 
         self.make_movie(title='The equalizer', actors_data=[denzel_washington, marton_csokas]) # noqa
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['add_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.post(
             reverse('reviews:reviews_create_list'),
             data=json.dumps(
@@ -76,7 +104,8 @@ class ReviewApiTest(ReviewBaseTest):
                     'comment': 'Ótimo filme de ação' 
                 }
             ),
-            content_type='application/json'
+            content_type='application/json',
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         content = json.loads(response.content.decode('utf-8'))
@@ -94,8 +123,12 @@ class ReviewApiTest(ReviewBaseTest):
         self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['view_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.get(
-            reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': 3})
+            reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': 3}),
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         self.assertEqual(response.status_code, 404)                  
@@ -110,8 +143,12 @@ class ReviewApiTest(ReviewBaseTest):
         self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['view_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.get(
-            reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': 1})
+            reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': 1}),
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         review = json.loads(response.content.decode('utf-8'))
@@ -130,6 +167,9 @@ class ReviewApiTest(ReviewBaseTest):
         review = self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['change_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.put(
             reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': review.id}),
             data=json.dumps(
@@ -139,7 +179,8 @@ class ReviewApiTest(ReviewBaseTest):
                     'comment': review.comment   
                 }
             ),
-            content_type='application/json'
+            content_type='application/json',
+            headers={'Authorization': f'Bearer {token}'}
         )        
 
         movie = json.loads(response.content.decode('utf-8'))
@@ -158,6 +199,9 @@ class ReviewApiTest(ReviewBaseTest):
         review = self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['change_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.put(
             reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': review.id}),
             data=json.dumps(
@@ -167,7 +211,8 @@ class ReviewApiTest(ReviewBaseTest):
                     'comment': review.comment   
                 }
             ),
-            content_type='application/json'
+            content_type='application/json',
+            headers={'Authorization': f'Bearer {token}'}
         )        
 
         content = json.loads(response.content.decode('utf-8'))
@@ -187,8 +232,11 @@ class ReviewApiTest(ReviewBaseTest):
         review = self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['change_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.put(
-            reverse('movies:movies_retrieve_update_delete', kwargs={'pk': 3}),
+            reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': 3}),
             data=json.dumps(
                 { 
                     'movie': review.movie.id,
@@ -196,7 +244,8 @@ class ReviewApiTest(ReviewBaseTest):
                     'comment': 'Novo comentário'   
                 }
             ),
-            content_type='application/json'
+            content_type='application/json',
+            headers={'Authorization': f'Bearer {token}'}
         )        
 
         self.assertEqual(response.status_code, 404)
@@ -212,8 +261,12 @@ class ReviewApiTest(ReviewBaseTest):
         review = self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['delete_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.delete(
             reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': review.id}),
+            headers={'Authorization': f'Bearer {token}'}
         )        
 
         self.assertEqual(response.status_code, 204)
@@ -228,8 +281,12 @@ class ReviewApiTest(ReviewBaseTest):
         review = self.make_review(movie=movie)
         self.make_review(movie=movie, stars=4)
 
+        self.make_user_permissions(user=self.user, model=Review, perms=['delete_review'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.delete(
             reverse('reviews:reviews_retrieve_update_delete', kwargs={'pk': 3}),
+            headers={'Authorization': f'Bearer {token}'}
         )        
 
         self.assertEqual(response.status_code, 404)

@@ -1,12 +1,12 @@
 from datetime import date
-from django.test import TestCase
+from core.tests import BaseTest
 
 from genres.models import Genre
 from actors.models import Actor
 from movies.models import Movie
 
 
-class MovieBaseTest(TestCase):
+class MovieBaseTest(BaseTest):
 
     def make_genre(self, name='Padrão'):
         return Genre.objects.create(name=name)

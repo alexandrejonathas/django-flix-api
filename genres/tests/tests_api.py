@@ -1,14 +1,28 @@
 import json
 from django.urls import reverse
-
 from .tests_genre_base import GenreBaseTest
 
+from genres.models import Genre
 
 class GenreApiTest(GenreBaseTest):
 
+    def setUp(self):
+        self.userdata = {'username': 'user', 'password': 'password'}
+        
+        self.user = self.make_user(
+            username=self.userdata.get('username'),
+            password=self.userdata.get('password')
+        )
+
     def test_api_resource_genres_method_not_allowed(self):
 
-        response = self.client.patch(reverse('genres:genres_create_list'))
+        self.make_user_permissions(user=self.user, model=Genre, perms=['view_genre', 'change_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
+        response = self.client.patch(
+            reverse('genres:genres_create_list'),
+            headers={'Authorization': f'Bearer {token}'}
+        )
 
         self.assertEqual(response.status_code, 405)
 
@@ -17,7 +31,13 @@ class GenreApiTest(GenreBaseTest):
         self.make_genre(name='Ação')
         self.make_genre(name='Drama')
 
-        response = self.client.get(reverse('genres:genres_create_list'))
+        self.make_user_permissions(user=self.user, model=Genre, perms=['view_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
+        response = self.client.get(
+            reverse('genres:genres_create_list'),
+            headers={'Authorization': f'Bearer {token}'}
+        )
 
         genres = json.loads(response.content)
 
@@ -26,14 +46,27 @@ class GenreApiTest(GenreBaseTest):
         self.assertEqual(int(genres[0]['id']), 1)
         self.assertEqual(genres[0]['name'], 'Ação')
 
+    def test_api_resource_genres_list_not_send_jwt_token(self):
+
+        self.make_genre(name='Ação')
+        self.make_genre(name='Drama')
+
+        response = self.client.get(reverse('genres:genres_create_list'))
+
+        self.assertEqual(response.status_code, 401)        
+
     def test_api_resource_genres_create(self):
+
+        self.make_user_permissions(user=self.user, model=Genre, perms=['add_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
 
         genre = {'name': 'Terror'}
         
         response = self.client.post(
             reverse('genres:genres_create_list'), 
             data=json.dumps(genre),
-            content_type='application/json'
+            content_type='application/json',
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         genre = json.loads(response.content)
@@ -47,8 +80,12 @@ class GenreApiTest(GenreBaseTest):
         self.make_genre(name='Ação')
         self.make_genre(name='Drama')
 
+        self.make_user_permissions(user=self.user, model=Genre, perms=['view_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.get(
-            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 1})
+            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 1}),
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         genre = json.loads(response.content)
@@ -62,8 +99,12 @@ class GenreApiTest(GenreBaseTest):
         self.make_genre(name='Ação')
         self.make_genre(name='Drama')
 
+        self.make_user_permissions(user=self.user, model=Genre, perms=['view_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.get(
-            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 3})
+            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 3}),
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         self.assertEqual(response.status_code, 404)
@@ -72,10 +113,14 @@ class GenreApiTest(GenreBaseTest):
 
         self.make_genre(name='Ação')
 
+        self.make_user_permissions(user=self.user, model=Genre, perms=['change_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.put(
             reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 1}),
             data=json.dumps({'name': 'Comédia'}),
-            content_type='application/json'
+            content_type='application/json',
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         genre = json.loads(response.content)
@@ -87,10 +132,14 @@ class GenreApiTest(GenreBaseTest):
     def test_api_resource_genres_update_not_found(self):
 
         self.make_genre(name='Ação')
+        
+        self.make_user_permissions(user=self.user, model=Genre, perms=['change_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
 
         response = self.client.put(
             reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 2}),
-            data=json.dumps({'name': 'Comédia'})
+            data=json.dumps({'name': 'Comédia'}),
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         self.assertEqual(response.status_code, 404)
@@ -99,8 +148,12 @@ class GenreApiTest(GenreBaseTest):
 
         self.make_genre(name='Ação')
 
+        self.make_user_permissions(user=self.user, model=Genre, perms=['delete_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.delete(
-            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 1})
+            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 1}),
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         self.assertEqual(response.status_code, 204)
@@ -109,8 +162,12 @@ class GenreApiTest(GenreBaseTest):
 
         self.make_genre(name='Ação')
 
+        self.make_user_permissions(user=self.user, model=Genre, perms=['delete_genre'])  # noqa
+        token = self.get_jwt_token(userdata=self.userdata)
+
         response = self.client.delete(
-            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 2})
+            reverse('genres:genres_retrieve_update_delete', kwargs={'pk': 2}),
+            headers={'Authorization': f'Bearer {token}'}
         )
 
         self.assertEqual(response.status_code, 404)
