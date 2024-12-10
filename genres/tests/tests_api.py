@@ -14,12 +14,6 @@ class GenreApiTest(GenreBaseTest):
             password=self.userdata.get('password')
         )
 
-    def get_jwt_token(self, userdata={}):
-        response = self.client.post(
-            reverse('authentication:token'), data={**userdata}
-        )
-        return response.data.get('access')  # type: ignore
-
     def test_api_resource_genres_method_not_allowed(self):
 
         self.make_user_permissions(user=self.user, model=Genre, perms=['view_genre', 'change_genre'])  # noqa

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -26,4 +27,10 @@ class BaseTest(TestCase):
             else:    
                 user.user_permissions.add(permission)
         
-        user.save()    
+        user.save()
+
+    def get_jwt_token(self, userdata={}):
+        response = self.client.post(
+            reverse('authentication:token'), data={**userdata}
+        )
+        return response.data.get('access')  # type: ignore    

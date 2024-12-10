@@ -2,6 +2,7 @@ import json
 from django.urls import reverse
 
 from .tests_actor_base import ActorBaseTest
+from actors.models import Actor
 
 
 class ActorApiTest(ActorBaseTest):
