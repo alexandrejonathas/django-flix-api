@@ -1,5 +1,5 @@
 from datetime import date
-from django.test import TestCase
+from core.tests import BaseTest
 
 from genres.models import Genre
 from actors.models import Actor
@@ -7,7 +7,7 @@ from movies.models import Movie
 from reviews.models import Review
 
 
-class ReviewBaseTest(TestCase):
+class ReviewBaseTest(BaseTest):
 
     def make_genre(self, name='Padrão'):
         return Genre.objects.create(name=name)
